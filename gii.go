@@ -5,28 +5,25 @@ import (
 )
 
 // HandlerFunc defines the request handler used by gii
-type HandlerFunc func(http.ResponseWriter, *http.Request)
+type HandlerFunc func(ctx *Context)
 
 type Engine struct {
-	router map[string]HandlerFunc
+	router *router
 }
 
 func New() *Engine {
-	return &Engine{router: make(map[string]HandlerFunc)}
+	return &Engine{router: newRouter()}
 }
 
 func (e *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	key := req.Method + "-" + req.URL.Path
-	if h, ok := e.router[key]; ok {
-		h(w, req)
-	} else {
-		http.NotFound(w, req)
-	}
+	// TODO: 后续优化：使用对象池 sync.Pool复用对象，减少内存分配、释放和GC
+	c := newContext(w, req)
+	e.router.handle(c)
 }
 
 func (e *Engine) addRoute(method string, pattern string, handler HandlerFunc) {
 	// 请求方法和请求路径作为key
-	e.router[method+"-"+pattern] = handler
+	e.router.addRoute(method, pattern, handler)
 }
 
 // GET defines the method to add GET request
