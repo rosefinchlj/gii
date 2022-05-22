@@ -18,12 +18,19 @@ type Context struct {
 	Path string
 	// 请求的方法
 	Method string
+	// 路由参数
+	Params map[string]string
 	// http code
 	StatusCode int
 }
 
 func newContext(writer http.ResponseWriter, req *http.Request) *Context {
 	return &Context{Writer: writer, Req: req, Path: req.URL.Path, Method: req.Method}
+}
+
+func (c *Context) Param(key string) string {
+	value, _ := c.Params[key]
+	return value
 }
 
 func (c *Context) Query(key string) string {

@@ -19,6 +19,18 @@ func main() {
 		c.String(http.StatusOK, "hello %s, %d", c.Query("name"), c.QueryInt("age"))
 	})
 
+	// get
+	// http://localhost:8080/hello/gii
+	engine.GET("/hello/:name", func(ctx *gii.Context) {
+		ctx.String(http.StatusOK, "hello %s", ctx.Param("name"))
+	})
+
+	engine.GET("/assert/*filepath", func(ctx *gii.Context) {
+		ctx.JSON(http.StatusOK, gii.H{
+			"filepath": ctx.Param("filepath"),
+		})
+	})
+
 	// post
 	// http://localhost:8080/login
 	// x-www-form-urlencoded:
