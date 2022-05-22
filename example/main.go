@@ -42,5 +42,29 @@ func main() {
 		})
 	})
 
+	// 使用分组功能
+	// 大括号只是增加可读性，不影响代码结构
+	v1 := engine.Group("/v1")
+	{
+		v1.GET("/", func(c *gii.Context) {
+			c.String(http.StatusOK, "v1")
+		})
+	}
+
+	// 使用分组功能
+	v2 := engine.Group("/v2")
+	{
+		v2.GET("/:name", func(c *gii.Context) {
+			c.String(http.StatusOK, "v2: %s", c.Param("name"))
+		})
+
+		v2.POST("/login", func(c *gii.Context) {
+			c.JSON(http.StatusOK, gii.H{
+				"username": c.PostForm("user"),
+				"password": c.PostForm("password"),
+			})
+		})
+	}
+
 	log.Fatal(engine.Run(":8080"))
 }
