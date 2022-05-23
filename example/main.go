@@ -9,6 +9,10 @@ import (
 func main() {
 	engine := gii.New()
 
+	// 全局中间件
+	engine.Use(gii.Logger())
+	engine.Use(gii.Recovery())
+
 	engine.GET("/", func(c *gii.Context) {
 		c.HTML(http.StatusOK, "<h1>Hello Gii</h1>")
 	})
@@ -53,6 +57,7 @@ func main() {
 
 	// 使用分组功能
 	v2 := engine.Group("/v2")
+	v2.Use(onlyForV2())
 	{
 		v2.GET("/:name", func(c *gii.Context) {
 			c.String(http.StatusOK, "v2: %s", c.Param("name"))
@@ -67,4 +72,10 @@ func main() {
 	}
 
 	log.Fatal(engine.Run(":8080"))
+}
+
+func onlyForV2() gii.HandlerFunc {
+	return func(c *gii.Context) {
+		c.Abort(http.StatusInternalServerError, "forbidden")
+	}
 }
