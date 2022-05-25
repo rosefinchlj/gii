@@ -71,11 +71,16 @@ func main() {
 		})
 	}
 
+	engine.GET("/panic", func(ctx *gii.Context) {
+		var str = []string{"11"}
+		log.Println(str[2])
+	})
+
 	log.Fatal(engine.Run(":8080"))
 }
 
 func onlyForV2() gii.HandlerFunc {
 	return func(c *gii.Context) {
-		c.Abort(http.StatusInternalServerError, "forbidden")
+		log.Println("the middleware only for V2")
 	}
 }

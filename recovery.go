@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
 	"runtime"
 	"time"
 )
@@ -21,7 +23,7 @@ const reset = "\033[0m"
 func Recovery() HandlerFunc {
 	return func(c *Context) {
 		defer func() {
-			var logger log.Logger
+			var logger *log.Logger = log.New(os.Stderr, "\n\n\x1b[31m", log.LstdFlags)
 
 			if err := recover(); err != nil {
 				stack := stack(3)
@@ -36,6 +38,8 @@ func Recovery() HandlerFunc {
 
 				logger.Printf("[Recovery] %s panic recovered:\n%s\n%s%s",
 					timeFormat(time.Now()), err, stack, reset)
+
+				c.Abort(http.StatusInternalServerError, "Internal Server Error")
 			}
 		}()
 
